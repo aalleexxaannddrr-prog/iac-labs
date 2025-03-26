@@ -1,0 +1,19 @@
+---
+# Переменные по умолчанию для роли Docker
+
+# Список пакетов, необходимых для работы с репозиториями Docker
+docker_packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - software-properties-common
+
+# URL для GPG-ключа Docker
+docker_gpg_key_url: "https://download.docker.com/linux/ubuntu/gpg"
+
+# Репозиторий Docker. Используем переменную ansible_distribution_release для динамической подстановки версии Ubuntu.
+docker_repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+
+# Название пакета Docker, который будем устанавливать
+docker_package: docker-ce
+

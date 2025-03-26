@@ -1,0 +1,36 @@
+# Vagrantfile
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/focal64"
+  
+  # Отключение автоматического обновления VirtualBox Guest Additions
+  config.vbguest.auto_update = false
+
+  # Количество требуемых машин
+  SERVERS = 3
+
+  # Указываем имя сетевого адаптера для бридж-сети (Windows)
+  BRIDGE = "Intel(R) Wi-Fi 6 AX201 160MHz"
+
+  def create_host(config, hostname, ip)
+    config.vm.define hostname do |host|
+      # Настраиваем приватную сеть
+      host.vm.network "private_network", ip: ip
+
+      # Настраиваем бридж-сеть (если нужно получить IP в локальной сети)
+      host.vm.network "public_network", bridge: BRIDGE
+
+      host.vm.hostname = hostname
+
+      # Провиженер: устанавливаем Python3, python3-apt и включаем авто-синхронизацию времени
+      host.vm.provision "shell", inline: <<-SHELL
+        apt-get update
+        apt-get install -y python3 python3-apt
+        sudo timedatectl set-ntp true
+      SHELL
+    end
+  end
+
+  (1..SERVERS).each do |machine_id|
+    create_host(config, "srv#{machine_id}", "192.168.56.#{200 + machine_id}")
+  end
+end

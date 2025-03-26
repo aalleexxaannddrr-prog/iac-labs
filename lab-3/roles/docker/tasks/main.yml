@@ -1,0 +1,32 @@
+---
+- name: Обновление списка пакетов
+  apt:
+    update_cache: yes
+
+- name: Установка необходимых пакетов для работы с репозиториями
+  apt:
+    name: "{{ docker_packages }}"
+    state: present
+
+- name: Добавление GPG ключа для Docker
+  apt_key:
+    url: "{{ docker_gpg_key_url }}"
+    state: present
+
+- name: Добавление репозитория Docker
+  apt_repository:
+    repo: "{{ docker_repo }}"
+    state: present
+
+- name: Установка Docker
+  apt:
+    name: "{{ docker_package }}"
+    state: present
+    update_cache: yes
+
+- name: Запуск и включение Docker
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+
